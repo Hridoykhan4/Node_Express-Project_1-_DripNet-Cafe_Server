@@ -7,9 +7,12 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 /* 
-https://i.ibb.co/N6Jxhrk0/1.png
+DB_USER = hridoyKhanCafeShop
+DB_PASS = u8j9xe1YE4rKkmmt
 
 */
+
+
 
 // middleware
 app.use(cors());
@@ -25,6 +28,7 @@ const client = new MongoClient(uri, {
     deprecationErrors: true,
   },
 });
+
 
 async function run() {
   try {
