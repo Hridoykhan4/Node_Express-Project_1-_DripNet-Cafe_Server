@@ -12,8 +12,6 @@ DB_PASS = u8j9xe1YE4rKkmmt
 
 */
 
-
-
 // middleware
 app.use(cors());
 app.use(express.json());
@@ -29,11 +27,12 @@ const client = new MongoClient(uri, {
   },
 });
 
-
 async function run() {
   try {
     await client.connect();
+
     const coffeeCollection = client.db("coffeeDB").collection("coffee");
+    const userCollection = client.db("coffeeDB").collection("users");
 
     // Get All Coffees
     app.get("/coffee", async (req, res) => {
@@ -85,6 +84,31 @@ async function run() {
       const result = await coffeeCollection.deleteOne(query);
       res.send(result);
     });
+
+    // Users Related API
+    // Post a User
+    app.post("/users", async (req, res) => {
+      const newUser = req.body;
+      console.log("Creating New User", newUser);
+      const result = await userCollection.insertOne(newUser);
+      console.log(result);
+      res.send(result);
+    });
+
+    // Get All Users
+    app.get("/users", async (req, res) => {
+      const cursor = userCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    // Delete a User
+    app.delete('/users/:id', async(req, res) => {
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)};
+      const result = await userCollection.deleteOne(query);
+      res.send(result);
+    })
 
     await client.db("admin").command({ ping: 1 });
     console.log(
