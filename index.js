@@ -33,6 +33,7 @@ async function run() {
 
     const coffeeCollection = client.db("coffeeDB").collection("coffee");
     const userCollection = client.db("coffeeDB").collection("users");
+    const orderCollection = client.db("coffeeDB").collection("orders");
 
     // Get All Coffees
     app.get("/coffee", async (req, res) => {
@@ -102,13 +103,44 @@ async function run() {
       res.send(result);
     });
 
+    // hoy new data or old data hoyte pare;old data er change korte pari or new data create hyte pare
+    // PATCH -- ami jani existing data ase shetar moddhe kisu ekTa set Korbo
+    app.patch("/users", async (req, res) => {
+      const { email, lastSignInTime } = req.body;
+      const filter = { email: email };
+
+      const updateUser = {
+        $set: {
+          lastSignInTime: lastSignInTime,
+        },
+      };
+
+      const result = await userCollection?.updateOne(filter, updateUser);
+
+      res.send(result);
+    });
+
     // Delete a User
-    app.delete('/users/:id', async(req, res) => {
+    app.delete("/users/:id", async (req, res) => {
       const id = req.params.id;
-      const query = {_id: new ObjectId(id)};
+      const query = { _id: new ObjectId(id) };
       const result = await userCollection.deleteOne(query);
       res.send(result);
-    })
+    });
+
+    // Order Related APIs
+
+    app.post("/orders", async (req, res) => {
+      const order = req.body;
+      const result = await orderCollection.insertOne(order);
+      res.send(result);
+    });
+
+    app.get("/orders", async (req, res) => {
+      const cursor = await orderCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
 
     await client.db("admin").command({ ping: 1 });
     console.log(
